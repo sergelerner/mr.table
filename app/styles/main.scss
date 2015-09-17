@@ -1,0 +1,68 @@
+$border-color: #EFE7BE;
+$bg-color: #002635;
+$text-color: #DBD4AE;
+$thumb-color: #91161F;
+$selected-color: tomato;
+
+body {
+    background: $bg-color;
+    color: $text-color;
+    font-family: 'Lato', Arial, sans-serif;
+    padding: 200px 50px;
+}
+
+table {
+    margin: 0 auto;
+    overflow: scroll;    
+    display: inline-block;
+    height: 350px; 
+    width: 700px;
+    -webkit-box-shadow: 0 0 100px rgba(0,0,0,0.2);    
+}
+
+
+table, th, td {
+    border: 1px solid $border-color;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 5px 15px;
+}
+
+tr.selected {
+    background: $selected-color;
+    color: $bg-color;
+}
+
+.maincomp {
+    text-align: center;
+}
+
+.spinner {
+    text-align: center;   
+    position: absolute;
+    top: -150px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    width: 200px;
+    height: 60px;
+}
+
+table::-webkit-scrollbar-track {    
+    -webkit-box-shadow: inset 0 0 3px rgba(0,0,0,0.5);    
+    background-color: transparent;
+}
+
+table::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    background-color: transparent;
+}
+
+table::-webkit-scrollbar-thumb {    
+    -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
+    background-color: $thumb-color;
+}
