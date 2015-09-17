@@ -10,5 +10,4 @@ Dev Dependencies
 - Browserify
 - Watchify
 - Babelify
-- Bower
 - Sass
