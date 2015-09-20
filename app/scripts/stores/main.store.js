@@ -41,6 +41,8 @@ var RequestStore = Reflux.createStore({
                     this.state.isWaiting = false;
                     this.state.tableData = tableData; 
 
+                    console.log("state", this.state);
+
                     this.trigger(this.state);
 
                 }.bind(this));
@@ -83,6 +85,16 @@ var RequestStore = Reflux.createStore({
         }
     },    
 
+    sortMap: function(map, sortBy) {
+        var mapValues       = [...map.values()];
+        var mapKeys         = [...map.keys()];
+        var mapValuesSorted = _.sortBy(mapValues, sortBy);
+
+        return new Map(mapValuesSorted.map(function(item, index) {
+            return [mapKeys[index], item]
+        }));
+    },
+
     handleSelection: function(selectionArray, flatMap) {
 
         _.forOwn(flatMap, function(value, key) {
@@ -111,8 +123,18 @@ var RequestStore = Reflux.createStore({
         this.trigger(this.state);        
     },
 
-    clickOnCell: function(item) {
+    onClickOnCell: function(item) {
         console.log("clickOnCell", item);
+    },
+
+    onSort: function(sortBy) {
+        var flatMap   = this.sortMap(this.flatMap, sortBy);        
+        var tableData = this.createTableData(flatMap);   
+
+        this.flatMap         = flatMap;
+        this.state.tableData = tableData;   
+
+        this.trigger(this.state);
     }
 
 });

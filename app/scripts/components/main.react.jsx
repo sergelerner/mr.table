@@ -18,6 +18,7 @@ var Main = React.createClass({
     handleCellClick: function(item) {  
         Actions.deselectAll();         
         Actions.select([item]);
+        Actions.clickOnCell(item);
     },
 
     handleCheck: function(item) {
@@ -37,6 +38,10 @@ var Main = React.createClass({
         }        
     },
 
+    handleTableHeaderClick: function(item) {
+        Actions.sort(item);
+    },
+
     createTable: function() {   
         	
     	if (this.state === null) return;
@@ -46,8 +51,8 @@ var Main = React.createClass({
             table: function() {
 
                 var th = this.state.tableData.headers.map(function(item, i) {
-                    return (<th>{item}</th>);
-                });
+                    return (<th onClick={this.handleTableHeaderClick.bind(null, item)}>{item}</th>);
+                }, this);
 
                 var rows = this.state.tableData.rows.map(function(row, i) {
 
