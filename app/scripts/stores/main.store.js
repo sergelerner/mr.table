@@ -6,22 +6,25 @@ var _              = require("lodash");
 
 var RequestStore = Reflux.createStore({
 
-    number: 800,
+    number: 10,
 
     flatMap: null,
 
     state: {
         isRender: true,
-        isWaiting: true        
+        isWaiting: true,
+        tableData: {}        
     },
 
     listenables: [Actions],
 
+    getInitialState: function() {
+        return this.state;
+    },
+
     init: function() {
 
-        this.listenTo(SelectionStore, this.listenSelectionStore);
-
-        console.time("getRandomData");                
+        this.listenTo(SelectionStore, this.listenSelectionStore);            
 
         var dummyData  = Backend.getRandomData(this.number);
         var tableData  = null;
@@ -29,64 +32,58 @@ var RequestStore = Reflux.createStore({
         if (Promise.resolve(dummyData) === dummyData) {
 
             dummyData
-                .then(function(collection) { 
-                    console.timeEnd("getRandomData");  
-                    console.log("AJAX", this.number, " Items"); 
-                    var flatMap   = this.flatMap(collection);
+                .then(function(collection) {                     
+
+                    var flatMap   = this.createMap(collection);
                     var tableData = this.createTableData(flatMap);  
-                    
+
                     this.flatMap         = flatMap;
                     this.state.isWaiting = false;
                     this.state.tableData = tableData; 
 
                     this.trigger(this.state);
+
                 }.bind(this));
         }        
     },
 
-    flatMap: function(collection) {
-        
-        function _extendItam(obj) {
-            return _.merge(obj, {
-                isSelected: false
-            });
+    createMap: function(collection) {
+
+        var extendWith = {
+            isSelected: false
         }
 
-        return _.indexBy(_.map(collection, _extendItam), "id");
+        function _extendItam(obj) {
+            return _.merge(obj, extendWith);
+        }
+
+        return new Map(collection.map(function(item, index) {
+            return [item.id, _.merge(item, extendWith)];
+        }));
     },
 
-    createTableData: function(flatMap) {
+    createTableData: function(map) {
 
-        var headers = [];
-        var rows    = [];
+        var mapValues   = [...map.values()];
+        var headers     = [];
+        var rows        = [];
 
-        for (var id in flatMap) { 
-            headers = _.keys(_.omit(flatMap[id], "id", "isSelected"));
-            break;
-        }
+        headers = _.keys(_.omit(mapValues[0], "id", "isSelected"));
 
-        for (var id in flatMap) {
-
-            var item     = flatMap[id];
-
+        rows = mapValues.map(function(item, index) {
             var metadata = _.pick(item, "id", "isSelected");
             var reldata  = _.omit(item, "id", "isSelected");            
             var row      = _.merge(metadata, {row: _.values(reldata)});
-
-            rows.push(row);
-        }
+            return row;
+        });
 
         return {
             headers: headers,
             rows: rows
         }
-    },
+    },    
 
-    getInitialState: function() {
-        return this.state;
-    },
-
-    handleSelection: function(selectionArray, flatMap) {        
+    handleSelection: function(selectionArray, flatMap) {
 
         _.forOwn(flatMap, function(value, key) {
             value.isSelected = false;
@@ -94,8 +91,10 @@ var RequestStore = Reflux.createStore({
 
         if (selectionArray.length === 0) return flatMap;
 
-        selectionArray.forEach(function(item) {
-            flatMap[item.id].isSelected = !item.isSelected;
+        selectionArray.forEach(function(item) {             
+            let current        = flatMap.get(item.id);            
+            current.isSelected = !item.isSelected;
+            flatMap.set(item.id, current);            
         }, this);        
 
         return flatMap;
@@ -103,17 +102,9 @@ var RequestStore = Reflux.createStore({
 
     ////////////////////////////////////////////////////////////
     
-    listenSelectionStore: function(selectionArray) { 
-
-        console.log("%c on select", "background: tomato");
-        
-        console.time("handleSelection");        
-        var flatMap   = this.handleSelection(selectionArray, this.flatMap);
-        console.timeEnd("handleSelection");
-
-        console.time("createTableData");        
+    listenSelectionStore: function(selectionArray) {    
+        var flatMap   = this.handleSelection(selectionArray, this.flatMap);     
         var tableData = this.createTableData(flatMap); 
-        console.timeEnd("createTableData");
 
         this.flatMap         = flatMap;   
         this.state.tableData = tableData;   
