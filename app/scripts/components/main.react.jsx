@@ -17,9 +17,7 @@ var Main = React.createClass({
 
     handleCellClick: function(item) {  
         Actions.clearAndSelect([item]);                 
-        //Actions.deselectAll();
-        //Actions.select([item]);
-        //Actions.clickOnCell(item);
+        Actions.clickOnCell(item);
     },
 
     handleCheck: function(item) {

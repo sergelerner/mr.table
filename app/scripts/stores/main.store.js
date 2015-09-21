@@ -93,11 +93,15 @@ var RequestStore = Reflux.createStore({
         var mapValuesSorted = _.sortBy(mapValues, sortBy);
 
         return new Map(mapValuesSorted.map(function(item, index) {
-            return [mapKeys[index], item]
+            return [item.id, item]
         }));
     },
 
-    handleSelection: function(selectionArray, flatMap) {        
+    handleSelection: function(selectionArray, flatMap) { 
+
+        for (let [key, value] of flatMap) {
+            value.isSelected = false;
+        }
 
         if (selectionArray.length === 0) return flatMap;
 
