@@ -11,7 +11,7 @@ var SelectionStore = Reflux.createStore({
     listenables: [Actions],
 
     init: function() {
-        this.joinLeading(Actions.deselectAll, Actions.select, this.clearAndSelect);
+        
     },
 
     onClearAndSelect: function(itemsArray) {        
