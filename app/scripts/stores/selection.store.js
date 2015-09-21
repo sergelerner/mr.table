@@ -10,23 +10,32 @@ var SelectionStore = Reflux.createStore({
 
     listenables: [Actions],
 
-    onSelect: function(itemsArray) {
+    init: function() {
+        this.joinLeading(Actions.deselectAll, Actions.select, this.clearAndSelect);
+    },
+
+    onClearAndSelect: function(itemsArray) {        
+        this.state.selection = [];    
+        this.state.selection = _.union(this.state.selection, itemsArray);            
+        this.trigger(this.state.selection);
+    },
+
+    onSelect: function(itemsArray) {        
         this.state.selection = _.union(this.state.selection, itemsArray);        
         this.trigger(this.state.selection);
     },
 
-    onDeselect: function(itemsArray) {
+    onDeselect: function(itemsArray) {        
         this.state.selection = _.filter(this.state.selection, function(item) {
             return item.id !== itemsArray[0].id;
         });        
         this.trigger(this.state.selection);
     },
 
-    onDeselectAll: function() {
+    onDeselectAll: function() {        
         this.state.selection = [];        
         this.trigger(this.state.selection);
     }
-
     
 });
 

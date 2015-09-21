@@ -70,12 +70,14 @@ var RequestStore = Reflux.createStore({
         var headers     = [];
         var rows        = [];
 
-        headers = _.keys(_.omit(mapValues[0], "id", "isSelected"));
+        var omitFromTable = ["isSelected"]; // ["id", "isSelected"];
+
+        headers = _.keys(_.omit(mapValues[0], omitFromTable));
 
         rows = mapValues.map(function(item, index) {
-            var metadata = _.pick(item, "id", "isSelected");
-            var reldata  = _.omit(item, "id", "isSelected");            
-            var row      = _.merge(metadata, {row: _.values(reldata)});
+            var metadata = _.pick(item, ["id", "isSelected"]);
+            var rowdata  = _.omit(item, omitFromTable);            
+            var row      = _.merge(metadata, {row: _.values(rowdata)});
             return row;
         });
 
@@ -95,16 +97,12 @@ var RequestStore = Reflux.createStore({
         }));
     },
 
-    handleSelection: function(selectionArray, flatMap) {
-
-        _.forOwn(flatMap, function(value, key) {
-            value.isSelected = false;
-        });
+    handleSelection: function(selectionArray, flatMap) {        
 
         if (selectionArray.length === 0) return flatMap;
 
-        selectionArray.forEach(function(item) {             
-            let current        = flatMap.get(item.id);            
+        selectionArray.forEach(function(item) {                
+            var current        = flatMap.get(item.id);            
             current.isSelected = !item.isSelected;
             flatMap.set(item.id, current);            
         }, this);        
