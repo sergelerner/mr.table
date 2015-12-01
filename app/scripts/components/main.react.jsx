@@ -6,17 +6,17 @@ var MainStore = require("../stores/main.store.js");
 var Main = React.createClass({
 
 	mixins: [Reflux.listenTo(MainStore, "onChangeCallback", "initialCallback")],
-  
-    onChangeCallback: function(data) {        
+
+    onChangeCallback: function(data) {
        this.setState(data);
     },
 
-    initialCallback: function(data) {      	
+    initialCallback: function(data) {
     	this.setState(data);
-    },  
+    },
 
-    handleCellClick: function(item) {  
-        Actions.clearAndSelect([item]);                 
+    handleCellClick: function(item) {
+        Actions.clearAndSelect([item]);
         Actions.clickOnCell(item);
     },
 
@@ -28,21 +28,21 @@ var Main = React.createClass({
         }
     },
 
-    handleCheckAll: function(e) {        
+    handleCheckAll: function(e) {
 
-        if (e.target.checked === true) {            
+        if (e.target.checked === true) {
             Actions.select(this.state.tableData.rows);
         } else {
             Actions.deselectAll();
-        }        
+        }
     },
 
     handleTableHeaderClick: function(item) {
         Actions.sort(item);
     },
 
-    createTable: function() {   
-        	
+    createTable: function() {
+
     	if (this.state === null) return;
 
         var template = {
@@ -50,12 +50,15 @@ var Main = React.createClass({
             table: function() {
 
                 var th = this.state.tableData.headers.map(function(item, i) {
-                    return (<th onClick={this.handleTableHeaderClick.bind(null, item)}>{item}</th>);
+                    var sort = this.state.sortable.indexOf(item) > -1 ? this.handleTableHeaderClick.bind(null, item) : null;
+                    return (
+                        <th onClick={sort}>{item}</th>
+                    );
                 }, this);
 
                 var rows = this.state.tableData.rows.map(function(row, i) {
 
-                    var rowData = row.row.map(function(data, j) {                                            
+                    var rowData = row.row.map(function(data, j) {
                         return (<td onClick={this.handleCellClick.bind(null, row)}>{data}</td>)
                     }, this);
 
@@ -84,8 +87,8 @@ var Main = React.createClass({
 
                             <tbody>
                                 {rows}
-                            </tbody>                                        
-                            
+                            </tbody>
+
                         </table>
                     </div>
                 )
@@ -93,28 +96,28 @@ var Main = React.createClass({
             },
 
             spinner: function() {
-                return ( 
+                return (
                     <div className="spinner">
-                        <div className="pong-loader"></div> 
-                    </div>                    
+                        <div className="pong-loader"></div>
+                    </div>
                 );
             }
-        }        
-      
-      	var result = (this.state.isRender === true && this.state.isWaiting) ? template["spinner"].call(this) : 
+        }
+
+      	var result = (this.state.isRender === true && this.state.isWaiting) ? template["spinner"].call(this) :
                      (this.state.isRender === true) ? template["table"].call(this) : null;
-        
+
         return result;
     },
 
     render: function() {
-        console.time("createTable"); 
+        console.time("createTable");
         return (
-            <div>       
+            <div>
                 {this.createTable()}
             </div>
         );
-        
+
     },
 
     componentDidUpdate: function() {

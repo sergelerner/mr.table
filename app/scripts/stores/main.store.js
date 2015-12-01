@@ -10,10 +10,14 @@ var RequestStore = Reflux.createStore({
 
     flatMap: null,
 
+    currentSorted: null,
+
     state: {
         isRender: true,
         isWaiting: true,
-        tableData: {}        
+        tableData: {},
+        sortable: ["fname", "lname"],
+        filterable: ["fname", "lname"]
     },
 
     listenables: [Actions],
@@ -24,7 +28,7 @@ var RequestStore = Reflux.createStore({
 
     init: function() {
 
-        this.listenTo(SelectionStore, this.listenSelectionStore);            
+        this.listenTo(SelectionStore, this.listenSelectionStore);
 
         var dummyData  = Backend.getRandomData(this.number);
         var tableData  = null;
@@ -32,21 +36,21 @@ var RequestStore = Reflux.createStore({
         if (Promise.resolve(dummyData) === dummyData) {
 
             dummyData
-                .then(function(collection) {                     
+                .then(function(collection) {
 
                     var flatMap   = this.createMap(collection);
-                    var tableData = this.createTableData(flatMap);  
+                    var tableData = this.createTableData(flatMap);
 
                     this.flatMap         = flatMap;
                     this.state.isWaiting = false;
-                    this.state.tableData = tableData; 
+                    this.state.tableData = tableData;
 
                     console.log("state", this.state);
 
                     this.trigger(this.state);
 
                 }.bind(this));
-        }        
+        }
     },
 
     createMap: function(collection) {
@@ -76,7 +80,7 @@ var RequestStore = Reflux.createStore({
 
         rows = mapValues.map(function(item, index) {
             var metadata = _.pick(item, ["id", "isSelected"]);
-            var rowdata  = _.omit(item, omitFromTable);            
+            var rowdata  = _.omit(item, omitFromTable);
             var row      = _.merge(metadata, {row: _.values(rowdata)});
             return row;
         });
@@ -85,19 +89,21 @@ var RequestStore = Reflux.createStore({
             headers: headers,
             rows: rows
         }
-    },    
+    },
 
-    sortMap: function(map, sortBy) {
+    sortMap: function(map, sortBy, currentSorted) {
+        var isAlreadySorted = this.currentSorted === sortBy ? true : false;
+        var sortDirection = isAlreadySorted ? "desc" : "asc";
         var mapValues       = [...map.values()];
         var mapKeys         = [...map.keys()];
-        var mapValuesSorted = _.sortBy(mapValues, sortBy);
+        var mapValuesSorted = _.sortByOrder(mapValues, sortBy, sortDirection);
 
         return new Map(mapValuesSorted.map(function(item, index) {
             return [item.id, item]
         }));
     },
 
-    handleSelection: function(selectionArray, flatMap) { 
+    handleSelection: function(selectionArray, flatMap) {
 
         for (let [key, value] of flatMap) {
             value.isSelected = false;
@@ -105,24 +111,24 @@ var RequestStore = Reflux.createStore({
 
         if (selectionArray.length === 0) return flatMap;
 
-        selectionArray.forEach(function(item) {                
-            var current        = flatMap.get(item.id);            
+        selectionArray.forEach(function(item) {
+            var current        = flatMap.get(item.id);
             current.isSelected = !item.isSelected;
-            flatMap.set(item.id, current);            
-        }, this);        
+            flatMap.set(item.id, current);
+        }, this);
 
         return flatMap;
     },
 
     ////////////////////////////////////////////////////////////
-    
-    listenSelectionStore: function(selectionArray) {    
-        var flatMap   = this.handleSelection(selectionArray, this.flatMap);     
-        var tableData = this.createTableData(flatMap); 
 
-        this.flatMap         = flatMap;   
-        this.state.tableData = tableData;   
-        this.trigger(this.state);        
+    listenSelectionStore: function(selectionArray) {
+        var flatMap   = this.handleSelection(selectionArray, this.flatMap);
+        var tableData = this.createTableData(flatMap);
+
+        this.flatMap         = flatMap;
+        this.state.tableData = tableData;
+        this.trigger(this.state);
     },
 
     onClickOnCell: function(item) {
@@ -130,11 +136,13 @@ var RequestStore = Reflux.createStore({
     },
 
     onSort: function(sortBy) {
-        var flatMap   = this.sortMap(this.flatMap, sortBy);        
-        var tableData = this.createTableData(flatMap);   
+        // TODO: toggle sort
+        var flatMap   = this.sortMap(this.flatMap, sortBy, this.currentSorted);
+        this.currentSorted = this.currentSorted === sortBy ? null : sortBy;
+        var tableData = this.createTableData(flatMap);
 
         this.flatMap         = flatMap;
-        this.state.tableData = tableData;   
+        this.state.tableData = tableData;
 
         this.trigger(this.state);
     }
