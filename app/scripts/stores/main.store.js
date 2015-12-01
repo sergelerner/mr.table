@@ -140,7 +140,22 @@ var RequestStore = Reflux.createStore({
     },
 
     getFilterOptions: function(item) {
-        return _.pluck([...this.flatMap.values()], item);
+        function removeDuplicates(filterOptions) {
+            return filterOptions;
+        }
+
+        function capitalize(filterOptions) {
+            return filterOptions;
+        }
+
+        var mapValues = [...this.flatMap.values()];
+        var filterOptions = _.pluck(mapValues, item);
+
+        filterOptions = removeDuplicates(filterOptions);
+        filterOptions = capitalize(filterOptions);
+
+
+        return  filterOptions;
     },
 
     onClickOnCell: function(item) {
