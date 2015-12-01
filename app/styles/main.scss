@@ -108,7 +108,17 @@ table::-webkit-scrollbar-thumb {
         left: 0;
         background: white;
         width: 200px;
-        height: 100px;
+        height: 300px;
         overflow: auto;
+        text-align: left;
+
+        fieldset {
+            input {
+                vertical-align: middle;
+            }
+            label {
+                vertical-align: middle;
+            }
+        }
     }
 }

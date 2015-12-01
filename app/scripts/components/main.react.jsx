@@ -49,16 +49,35 @@ var Main = React.createClass({
     getFilterOptions: function() {
         return this.state.filterWindow.options.map(function(option, i) {
             return (
-                <p key={i}>{option}</p>
+                <fieldset key={i}>
+                    <input type="checkbox" />
+                    <label>{option}</label>
+                </fieldset>
             );
         }, this);
     },
 
+    clickFilterWindow: function(e) {
+        e.stopPropagation();
+    },
+
+    clearFilter: function(item, e) {
+        e.preventDefault();
+    },
+
+    filter: function(item, e) {
+        e.preventDefault();
+    },
+
     createFilter: function(item) {
         var filterWindow = this.state.filterWindow.item === item ? (
-            <div className="filter_window">
+            <form className="filter_window" onClick={this.clickFilterWindow}>
                 {this.getFilterOptions()}
-            </div>
+                <fieldset>
+                    <button onClick={this.clearFilter.bind(this, item)}>RESET</button>
+                    <button onClick={this.filter.bind(this, item)}>FILTER</button>
+                </fieldset>
+            </form>
         ) : null;
 
         return (
