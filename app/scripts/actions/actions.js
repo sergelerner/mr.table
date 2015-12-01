@@ -6,7 +6,8 @@ var Actions = Reflux.createActions({
 	"deselectAll"    : {},
 	"clearAndSelect" : {},
 	"clickOnCell"    : {},
-	"sort"           : {}
+	"sort"           : {},
+	"toggleFilter"   : {}
 });
 
 

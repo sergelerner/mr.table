@@ -67,6 +67,15 @@ table::-webkit-scrollbar-thumb {
     background-color: $thumb-color;
 }
 
+.wrap {
+    width: 100px;
+}
+
+.headline {
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .sort_arrow {
     display: block;
     margin: 0 auto;
@@ -81,5 +90,24 @@ table::-webkit-scrollbar-thumb {
 
     &.up {
         border-bottom: 5px solid white;
+    }
+}
+
+.filter {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+    width: 15px;
+    height: 15px;
+    background: lightgray;
+    position: relative;
+
+    .filter_window {
+        position: absolute;
+        top: 15px;
+        left: 0;
+        background: white;
+        width: 200px;
+        height: 100px;
     }
 }

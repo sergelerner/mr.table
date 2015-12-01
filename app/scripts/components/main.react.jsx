@@ -41,6 +41,23 @@ var Main = React.createClass({
         Actions.sort(item);
     },
 
+    toggleFilter: function(item, e) {
+        e.stopPropagation();
+        Actions.toggleFilter(item);
+    },
+
+    createFilter: function(item) {
+        var filterWindow = this.state.filterWindow.item === item ? (
+            <div className="filter_window"></div>
+        ) : null;
+
+        return (
+            <div className="filter" onClick={this.toggleFilter.bind(this, item)}>
+                {filterWindow}
+            </div>
+        );
+    },
+
     createTable: function() {
 
     	if (this.state === null) return;
@@ -51,14 +68,17 @@ var Main = React.createClass({
 
                 var th = this.state.tableData.headers.map(function(item, i) {
                     var sort = this.state.sortable.indexOf(item) > -1 ? this.handleTableHeaderClick.bind(null, item) : null;
-                    console.log(this.state.sortArrow.item);
                     var arrow = this.state.sortArrow.item === item ? (
                         <i className={"sort_arrow " + this.state.sortArrow.direction}></i>
                     ) : null;
+                    var filter = this.state.filterable.indexOf(item) > -1 ? this.createFilter(item) : null;
 
                     return (
                         <th onClick={sort}>
-                            {item}
+                            <div className="wrap">
+                                <span className="headline">{item}</span>
+                                {filter}
+                            </div>
                             {arrow}
                         </th>
                     );

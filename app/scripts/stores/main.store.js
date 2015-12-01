@@ -21,6 +21,9 @@ var RequestStore = Reflux.createStore({
         sortArrow: {
             item: null,
             direction: null
+        },
+        filterWindow: {
+            item: null
         }
     },
 
@@ -150,6 +153,13 @@ var RequestStore = Reflux.createStore({
         this.flatMap         = flatMap;
         this.state.tableData = tableData;
 
+        this.trigger(this.state);
+    },
+
+    onToggleFilter: function(item) {
+        console.log(item);
+        this.currentFilter = this.currentFilter === item ? null : item;
+        this.state.filterWindow.item = this.currentFilter;
         this.trigger(this.state);
     }
 
