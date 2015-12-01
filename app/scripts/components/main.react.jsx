@@ -51,8 +51,16 @@ var Main = React.createClass({
 
                 var th = this.state.tableData.headers.map(function(item, i) {
                     var sort = this.state.sortable.indexOf(item) > -1 ? this.handleTableHeaderClick.bind(null, item) : null;
+                    console.log(this.state.sortArrow.item);
+                    var arrow = this.state.sortArrow.item === item ? (
+                        <i className={"sort_arrow " + this.state.sortArrow.direction}></i>
+                    ) : null;
+
                     return (
-                        <th onClick={sort}>{item}</th>
+                        <th onClick={sort}>
+                            {item}
+                            {arrow}
+                        </th>
                     );
                 }, this);
 

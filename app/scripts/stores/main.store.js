@@ -17,7 +17,11 @@ var RequestStore = Reflux.createStore({
         isWaiting: true,
         tableData: {},
         sortable: ["fname", "lname"],
-        filterable: ["fname", "lname"]
+        filterable: ["fname", "lname"],
+        sortArrow: {
+            item: null,
+            direction: null
+        }
     },
 
     listenables: [Actions],
@@ -93,7 +97,7 @@ var RequestStore = Reflux.createStore({
 
     sortMap: function(map, sortBy, currentSorted) {
         var isAlreadySorted = this.currentSorted === sortBy ? true : false;
-        var sortDirection = isAlreadySorted ? "desc" : "asc";
+        var sortDirection   = isAlreadySorted ? "desc" : "asc";
         var mapValues       = [...map.values()];
         var mapKeys         = [...map.keys()];
         var mapValuesSorted = _.sortByOrder(mapValues, sortBy, sortDirection);
@@ -139,6 +143,8 @@ var RequestStore = Reflux.createStore({
         // TODO: toggle sort
         var flatMap   = this.sortMap(this.flatMap, sortBy, this.currentSorted);
         this.currentSorted = this.currentSorted === sortBy ? null : sortBy;
+        this.state.sortArrow.item = sortBy;
+        this.state.sortArrow.direction = this.currentSorted ? "down" : "up";
         var tableData = this.createTableData(flatMap);
 
         this.flatMap         = flatMap;
