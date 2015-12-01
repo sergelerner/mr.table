@@ -46,9 +46,19 @@ var Main = React.createClass({
         Actions.toggleFilter(item);
     },
 
+    getFilterOptions: function() {
+        return this.state.filterWindow.options.map(function(option, i) {
+            return (
+                <p key={i}>{option}</p>
+            );
+        }, this);
+    },
+
     createFilter: function(item) {
         var filterWindow = this.state.filterWindow.item === item ? (
-            <div className="filter_window"></div>
+            <div className="filter_window">
+                {this.getFilterOptions()}
+            </div>
         ) : null;
 
         return (
@@ -74,7 +84,7 @@ var Main = React.createClass({
                     var filter = this.state.filterable.indexOf(item) > -1 ? this.createFilter(item) : null;
 
                     return (
-                        <th onClick={sort}>
+                        <th onClick={sort} key={i}>
                             <div className="wrap">
                                 <span className="headline">{item}</span>
                                 {filter}
@@ -87,11 +97,11 @@ var Main = React.createClass({
                 var rows = this.state.tableData.rows.map(function(row, i) {
 
                     var rowData = row.row.map(function(data, j) {
-                        return (<td onClick={this.handleCellClick.bind(null, row)}>{data}</td>)
+                        return (<td onClick={this.handleCellClick.bind(null, row)} key={j}>{data}</td>)
                     }, this);
 
                     return (
-                        <tr className={(row.isSelected === true) ? "selected" : ""}>
+                        <tr className={(row.isSelected === true) ? "selected" : ""} key={i}>
                             <td>
                                 <input type="checkbox" checked={row.isSelected} onChange={this.handleCheck.bind(null, row)}/>
                             </td>

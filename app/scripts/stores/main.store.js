@@ -23,7 +23,8 @@ var RequestStore = Reflux.createStore({
             direction: null
         },
         filterWindow: {
-            item: null
+            item: null,
+            options: []
         }
     },
 
@@ -138,6 +139,10 @@ var RequestStore = Reflux.createStore({
         this.trigger(this.state);
     },
 
+    getFilterOptions: function(item) {
+        return _.pluck([...this.flatMap.values()], item);
+    },
+
     onClickOnCell: function(item) {
         console.log("clickOnCell", item);
     },
@@ -157,9 +162,9 @@ var RequestStore = Reflux.createStore({
     },
 
     onToggleFilter: function(item) {
-        console.log(item);
         this.currentFilter = this.currentFilter === item ? null : item;
         this.state.filterWindow.item = this.currentFilter;
+        this.state.filterWindow.options = this.getFilterOptions(item);
         this.trigger(this.state);
     }
 
