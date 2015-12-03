@@ -17,7 +17,18 @@ var RequestStore = Reflux.createStore({
         isWaiting: true,
         tableData: {},
         sortable: ["fname", "lname"],
-        filterable: ["fname", "lname"],
+        filterable: [
+            {
+                name: "fname",
+                isRender: false,
+                options: [] // {value: String, isChecked: Boolean}
+            },
+            {
+                name: "lname",
+                isRender: false,
+                options: [] // {value: String, isChecked: Boolean}
+            }
+        ],
         sortArrow: {
             item: null,
             direction: null
@@ -139,7 +150,10 @@ var RequestStore = Reflux.createStore({
         this.trigger(this.state);
     },
 
-    getFilterOptions: function(item) {
+    getFilterOptions: function(currentFilter) {
+        var name = currentFilter.name;
+        var currentOptions = currentFilter.options;
+
         function capitalize(options) {
             options = options.map(function(option) {
                 return option && option[0].toUpperCase() + option.slice(1).toLowerCase();
@@ -152,11 +166,28 @@ var RequestStore = Reflux.createStore({
             return _.uniq(options);
         }
 
-        var values = [...this.flatMap.values()];
-        var options = _.pluck(values, item);
+        var mapValues = [...this.flatMap.values()];
+        var newValues = _.pluck(mapValues, name);
 
-        options = capitalize(options);
-        options = removeDuplicates(options);
+        newValues = capitalize(newValues);
+        newValues = removeDuplicates(newValues);
+
+        var options = newValues.map(function(value) {
+            var idx = _.pluck(currentOptions, "value").indexOf(value);
+            if (idx === -1) {
+                return {
+                    value: value,
+                    isChecked: false
+                };
+            } else {
+                return {
+                    value: value,
+                    isChecked: currentOptions[idx].isChecked
+                };
+            }
+        });
+
+        console.log(options);
 
         return options;
     },
@@ -180,9 +211,24 @@ var RequestStore = Reflux.createStore({
     },
 
     onToggleFilter: function(item) {
-        this.currentFilter = this.currentFilter === item ? null : item;
-        this.state.filterWindow.item = this.currentFilter;
-        this.state.filterWindow.options = this.getFilterOptions(item);
+        var currentFilter = _.findWhere(this.state.filterable, {name: item});
+        currentFilter.options = this.getFilterOptions(currentFilter);
+        currentFilter.isRender = currentFilter.isRender === true ? false : true;
+        this.state.filterable = this.state.filterable.map(function(elm) {
+            if (elm.name !== item && elm.isRender === true) {
+                elm.isRender = false;
+            }
+            return elm;
+        }, this);
+
+        this.trigger(this.state);
+    },
+
+    onToggleCheckbox: function(name, option) {
+        var currentFilter = _.findWhere(this.state.filterable, {name: name});
+        var currentOption = _.findWhere(currentFilter.options, {value: option});
+        currentOption.isChecked = currentOption.isChecked === true ? false : true;
+
         this.trigger(this.state);
     }
 
