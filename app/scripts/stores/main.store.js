@@ -171,6 +171,7 @@ var RequestStore = Reflux.createStore({
 
         newValues = capitalize(newValues);
         newValues = removeDuplicates(newValues);
+        newValues.sort();
 
         var options = newValues.map(function(value) {
             var idx = _.pluck(currentOptions, "value").indexOf(value);
@@ -186,8 +187,6 @@ var RequestStore = Reflux.createStore({
                 };
             }
         });
-
-        console.log(options);
 
         return options;
     },
